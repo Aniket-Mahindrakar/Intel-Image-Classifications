@@ -1,0 +1,22 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/aniket-ai/myapp:v1', '.']
+  timeout: 600s
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/aniket-ai/myapp:v1']
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: "bash"
+  args:
+  - "-c"
+  - |
+    echo "Docker Container Built"
+    ls -la
+    ls -al app/models/
+- name: "gcr.io/cloud-builders/gke-deploy"
+  args:
+  - run
+  - --filename=K8s/
+  - --location=us-central1
+  - --cluster=mykube
+options:
+  logging: CLOUD_LOGGING_ONLY
